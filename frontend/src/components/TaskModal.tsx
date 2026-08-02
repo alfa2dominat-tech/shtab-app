@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Task, User } from '../types';
+import { Task, User, Project } from '../types';
 import { translations, Lang } from '../i18n';
 import { X } from 'lucide-react';
 
 interface TaskModalProps {
   task?: Task | null;
+  projects: Project[];
   projectMembers: User[];
   onClose: () => void;
   onSave: (taskData: any) => void;
@@ -14,6 +15,7 @@ interface TaskModalProps {
 
 export const TaskModal: React.FC<TaskModalProps> = ({
   task,
+  projects,
   projectMembers,
   onClose,
   onSave,
@@ -28,6 +30,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   const [status, setStatus] = useState<'new' | 'in_progress' | 'review' | 'done'>(task?.status || 'new');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>(task?.priority || 'medium');
   const [assigneeId, setAssigneeId] = useState(task?.assignee_id || '');
+  const [selectedProjectId, setSelectedProjectId] = useState(task?.project_id || projects[0]?.id || '');
 
   const t = translations[lang];
 
@@ -40,6 +43,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       status,
       priority,
       assignee_id: assigneeId || null,
+      project_id: selectedProjectId,
     });
   };
 
@@ -86,6 +90,23 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               placeholder={t.descPlaceholder}
               className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-shtab-accent resize-none"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+              {t.projectField}
+            </label>
+            <select
+              value={selectedProjectId}
+              onChange={(e) => setSelectedProjectId(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-shtab-accent"
+            >
+              {projects.map((proj) => (
+                <option key={proj.id} value={proj.id}>
+                  {proj.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

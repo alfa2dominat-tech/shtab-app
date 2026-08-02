@@ -199,45 +199,91 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		Status      string     `json:"status"`
 		Priority    string     `json:"priority"`
 		AssigneeID  *string    `json:"assignee_id"`
+		ProjectID   string     `json:"project_id"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
-	// Fetch old task state to check assignee changes or status changes
+	// Fetch old task state
 	var oldAssigneeID sql.NullString
 	var oldStatus string
-	var taskTitle string
-	err := db.DB.QueryRow(`SELECT assignee_id, status, title FROM tasks WHERE id = $1`, taskID).
-		Scan(&oldAssigneeID, &oldStatus, &taskTitle)
+	var oldTitle, oldDesc, oldPriority, oldProjectID string
+	var oldDueDate sql.NullTime
+	err := db.DB.QueryRow(`SELECT assignee_id, status, title, description, priority, due_date, project_id FROM tasks WHERE id = $1`, taskID).
+		Scan(&oldAssigneeID, &oldStatus, &oldTitle, &oldDesc, &oldPriority, &oldDueDate, &oldProjectID)
 	if err != nil {
 		http.Error(w, "Task not found", http.StatusNotFound)
 		return
 	}
 
-	var assigneeVal interface{}
-	if req.AssigneeID != nil && *req.AssigneeID != "" {
-		assigneeVal = *req.AssigneeID
-	} else {
-		assigneeVal = nil
-	}
-
 	var updatedTask models.Task
-	err = db.DB.QueryRow(`
-		UPDATE tasks 
-		SET title = COALESCE(NULLIF($1, ''), title),
-		    description = COALESCE($2, description),
-		    due_date = $3,
-		    status = COALESCE(NULLIF($4, ''), status),
-		    priority = COALESCE(NULLIF($5, ''), priority),
-		    assignee_id = $6,
-		    updated_at = CURRENT_TIMESTAMP,
-		    completed_at = CASE WHEN $4 = 'done' AND status != 'done' THEN CURRENT_TIMESTAMP ELSE completed_at END
-		WHERE id = $7
-		RETURNING id, project_id, title, description, due_date, status, priority, assignee_id, author_id, created_at, updated_at`,
-		req.Title, req.Description, req.DueDate, req.Status, req.Priority, assigneeVal, taskID,
-	).Scan(&updatedTask.ID, &updatedTask.ProjectID, &updatedTask.Title, &updatedTask.Description, &updatedTask.DueDate, &updatedTask.Status, &updatedTask.Priority, &updatedTask.AssigneeID, &updatedTask.AuthorID, &updatedTask.CreatedAt, &updatedTask.UpdatedAt)
+
+	// If title is empty and status is provided, treat as partial update (drag-and-drop status change)
+	if req.Title == "" && req.Status != "" && req.ProjectID == "" {
+		err = db.DB.QueryRow(`
+			UPDATE tasks 
+			SET status = $1,
+			    updated_at = CURRENT_TIMESTAMP,
+			    completed_at = CASE WHEN $1 = 'done' AND status != 'done' THEN CURRENT_TIMESTAMP ELSE completed_at END
+			WHERE id = $2
+			RETURNING id, project_id, title, description, due_date, status, priority, assignee_id, author_id, created_at, updated_at`,
+			req.Status, taskID,
+		).Scan(&updatedTask.ID, &updatedTask.ProjectID, &updatedTask.Title, &updatedTask.Description, &updatedTask.DueDate, &updatedTask.Status, &updatedTask.Priority, &updatedTask.AssigneeID, &updatedTask.AuthorID, &updatedTask.CreatedAt, &updatedTask.UpdatedAt)
+	} else {
+		title := req.Title
+		if title == "" {
+			title = oldTitle
+		}
+		description := req.Description
+		priority := req.Priority
+		if priority == "" {
+			priority = oldPriority
+		}
+		status := req.Status
+		if status == "" {
+			status = oldStatus
+		}
+		projectID := req.ProjectID
+		if projectID == "" {
+			projectID = oldProjectID
+		}
+
+		var dueDateVal interface{}
+		if req.DueDate != nil {
+			dueDateVal = *req.DueDate
+		} else if oldDueDate.Valid {
+			dueDateVal = oldDueDate.Time
+		} else {
+			dueDateVal = nil
+		}
+
+		var assigneeVal interface{}
+		if req.AssigneeID != nil && *req.AssigneeID != "" {
+			assigneeVal = *req.AssigneeID
+		} else if oldAssigneeID.Valid {
+			assigneeVal = oldAssigneeID.String
+		} else {
+			assigneeVal = nil
+		}
+
+		err = db.DB.QueryRow(`
+			UPDATE tasks 
+			SET title = $1,
+			    description = $2,
+			    due_date = $3,
+			    status = $4,
+			    priority = $5,
+			    assignee_id = $6,
+			    project_id = $7,
+			    updated_at = CURRENT_TIMESTAMP,
+			    completed_at = CASE WHEN $4 = 'done' AND status != 'done' THEN CURRENT_TIMESTAMP ELSE completed_at END
+			WHERE id = $8
+			RETURNING id, project_id, title, description, due_date, status, priority, assignee_id, author_id, created_at, updated_at`,
+			title, description, dueDateVal, status, priority, assigneeVal, projectID, taskID,
+		).Scan(&updatedTask.ID, &updatedTask.ProjectID, &updatedTask.Title, &updatedTask.Description, &updatedTask.DueDate, &updatedTask.Status, &updatedTask.Priority, &updatedTask.AssigneeID, &updatedTask.AuthorID, &updatedTask.CreatedAt, &updatedTask.UpdatedAt)
+	}
 
 	if err != nil {
 		http.Error(w, "Failed to update task", http.StatusInternalServerError)

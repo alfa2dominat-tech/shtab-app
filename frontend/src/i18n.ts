@@ -46,6 +46,7 @@ export const translations = {
     priority: "Priority",
     dueDate: "Due Date",
     status: "Status",
+    projectField: "Project",
 
     // Task Modal
     editTask: "Edit Task",
@@ -134,6 +135,7 @@ export const translations = {
     priority: "Приоритет",
     dueDate: "Срок выполнения",
     status: "Статус",
+    projectField: "Проект",
 
     // Task Modal
     editTask: "Редактировать задачу",
@@ -157,7 +159,7 @@ export const translations = {
 
     // Admin
     adminTitle: "Кабинет администратора",
-    adminSubtitle: "Управление зарегистрированными пользователями и назначение ролей доступа.",
+    adminSubtitle: "Управление зарегистрировантелями пользователями и назначение ролей доступа.",
     userColumn: "Пользователь",
     emailColumn: "Email",
     roleColumn: "Роль",

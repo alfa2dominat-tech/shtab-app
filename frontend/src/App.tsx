@@ -141,12 +141,19 @@ export function App() {
   const handleSaveTask = async (taskData: any) => {
     if (!activeProjectID) return;
     try {
+      const targetProjectId = taskData.project_id || activeProjectID;
       if (editingTask) {
         const updated = await api.put<Task>(`/tasks/${editingTask.id}`, taskData);
-        setTasks(tasks.map((t) => (t.id === updated.id ? updated : t)));
+        if (updated.project_id !== activeProjectID) {
+          setTasks(tasks.filter((t) => t.id !== updated.id));
+        } else {
+          setTasks(tasks.map((t) => (t.id === updated.id ? updated : t)));
+        }
       } else {
-        const created = await api.post<Task>(`/projects/${activeProjectID}/tasks`, taskData);
-        setTasks([created, ...tasks]);
+        const created = await api.post<Task>(`/projects/${targetProjectId}/tasks`, taskData);
+        if (targetProjectId === activeProjectID) {
+          setTasks([created, ...tasks]);
+        }
       }
       setIsTaskModalOpen(false);
       setEditingTask(null);
@@ -281,6 +288,7 @@ export function App() {
       {isTaskModalOpen && (
         <TaskModal
           task={editingTask}
+          projects={projects}
           projectMembers={activeProject?.members || []}
           onClose={() => { setIsTaskModalOpen(false); setEditingTask(null); }}
           onSave={handleSaveTask}
