@@ -224,9 +224,9 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if req.Title == "" && req.Status != "" && req.ProjectID == "" {
 		err = db.DB.QueryRow(`
 			UPDATE tasks 
-			SET status = $1,
+			SET status = $1::TEXT,
 			    updated_at = CURRENT_TIMESTAMP,
-			    completed_at = CASE WHEN $1 = 'done' AND status != 'done' THEN CURRENT_TIMESTAMP ELSE completed_at END
+			    completed_at = CASE WHEN $1::TEXT = 'done' AND status != 'done' THEN CURRENT_TIMESTAMP ELSE completed_at END
 			WHERE id = $2
 			RETURNING id, project_id, title, description, due_date, status, priority, assignee_id, author_id, created_at, updated_at`,
 			req.Status, taskID,
@@ -270,15 +270,15 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = db.DB.QueryRow(`
 			UPDATE tasks 
-			SET title = $1,
-			    description = $2,
+			SET title = $1::TEXT,
+			    description = $2::TEXT,
 			    due_date = $3,
-			    status = $4,
-			    priority = $5,
+			    status = $4::TEXT,
+			    priority = $5::TEXT,
 			    assignee_id = $6,
-			    project_id = $7,
+			    project_id = $7::UUID,
 			    updated_at = CURRENT_TIMESTAMP,
-			    completed_at = CASE WHEN $4 = 'done' AND status != 'done' THEN CURRENT_TIMESTAMP ELSE completed_at END
+			    completed_at = CASE WHEN $4::TEXT = 'done' AND status != 'done' THEN CURRENT_TIMESTAMP ELSE completed_at END
 			WHERE id = $8
 			RETURNING id, project_id, title, description, due_date, status, priority, assignee_id, author_id, created_at, updated_at`,
 			title, description, dueDateVal, status, priority, assigneeVal, projectID, taskID,
