@@ -12,6 +12,7 @@ interface KanbanBoardProps {
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   tasks,
+  onUpdateTaskStatus,
   onSelectTask,
   lang,
 }) => {
@@ -39,6 +40,22 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     urgent: 'bg-red-100 text-red-700 font-bold',
   };
 
+  const handleDragStart = (e: React.DragEvent, taskId: string) => {
+    e.dataTransfer.setData('text/plain', taskId);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, status: 'new' | 'in_progress' | 'review' | 'done') => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData('text/plain');
+    if (taskId) {
+      onUpdateTaskStatus(taskId, status);
+    }
+  };
+
   return (
     <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-6 p-8 overflow-x-auto bg-shtab-light items-start">
       {columns.map((col) => {
@@ -56,15 +73,21 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
             </div>
 
-            {/* Tasks List in Column */}
-            <div className="p-3 overflow-y-auto space-y-3 flex-1 min-h-[300px]">
+            {/* Tasks List in Column (Drop Zone) */}
+            <div
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, col.id)}
+              className="p-3 overflow-y-auto space-y-3 flex-1 min-h-[300px]"
+            >
               {colTasks.map((task) => {
                 const dueSoon = isDueSoon(task.due_date);
                 return (
                   <div
                     key={task.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, task.id)}
                     onClick={() => onSelectTask(task)}
-                    className={`bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition cursor-pointer relative group ${
+                    className={`bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition cursor-grab active:cursor-grabbing relative group ${
                       dueSoon ? 'border-red-400 bg-red-50/20' : 'border-slate-200 hover:border-slate-300'
                     }`}
                   >
@@ -110,7 +133,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 );
               })}
               {colTasks.length === 0 && (
-                <div className="h-24 flex items-center justify-center text-xs text-slate-400 border-2 border-dashed border-slate-100 rounded-xl">
+                <div className="h-24 flex items-center justify-center text-xs text-slate-400 border-2 border-dashed border-slate-100 rounded-xl pointer-events-none">
                   {t.noTasks}
                 </div>
               )}
