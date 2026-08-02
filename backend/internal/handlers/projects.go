@@ -13,18 +13,16 @@ import (
 )
 
 func GetProjectsHandler(w http.ResponseWriter, r *http.Request) {
-	claims, ok := r.Context().Value(auth.UserContextKey).(*auth.Claims)
+	_, ok := r.Context().Value(auth.UserContextKey).(*auth.Claims)
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	rows, err := db.DB.Query(`
-		SELECT DISTINCT p.id, p.name, p.description, p.owner_id, p.created_at 
-		FROM projects p
-		LEFT JOIN project_members pm ON p.id = pm.project_id
-		WHERE p.owner_id = $1 OR pm.user_id = $1
-		ORDER BY p.created_at DESC`, claims.UserID)
+		SELECT id, name, description, owner_id, created_at 
+		FROM projects
+		ORDER BY created_at DESC`)
 	if err != nil {
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return

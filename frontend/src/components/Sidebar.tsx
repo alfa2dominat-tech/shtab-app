@@ -1,7 +1,7 @@
 import React from 'react';
 import { Project, User } from '../types';
 import { translations, Lang } from '../i18n';
-import { FolderKanban, Plus, BarChart2, Shield, LogOut, ChevronRight } from 'lucide-react';
+import { FolderKanban, Plus, BarChart2, Shield, LogOut, ChevronRight, Briefcase } from 'lucide-react';
 
 interface SidebarProps {
   user: User;
@@ -109,8 +109,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'
                   }`}
                 >
-                  <span className="truncate">{proj.name}</span>
-                  {isActive && <ChevronRight size={14} className="text-shtab-accent" />}
+                  <div className="flex items-center space-x-2.5 truncate">
+                    <Briefcase size={15} className={isActive ? 'text-shtab-accent shrink-0' : 'text-slate-500 shrink-0'} />
+                    <span className="truncate">{proj.name}</span>
+                  </div>
+                  {isActive && <ChevronRight size={14} className="text-shtab-accent shrink-0" />}
                 </button>
               );
             })}
