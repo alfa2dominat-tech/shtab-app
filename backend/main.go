@@ -13,11 +13,30 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"golang.org/x/crypto/bcrypt"
 )
+
+func seedAdmin() {
+	if db.DB == nil {
+		return
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
+	if err != nil {
+		return
+	}
+	_, _ = db.DB.Exec(`
+		INSERT INTO users (id, email, password_hash, name, role)
+		VALUES ('00000000-0000-0000-0000-000000000001', 'admin@shtab.local', $1, 'Administrator', 'admin')
+		ON CONFLICT (email) DO UPDATE SET password_hash = $1, role = 'admin'`,
+		string(hashedPassword),
+	)
+}
 
 func main() {
 	if err := db.InitDB(); err != nil {
 		log.Printf("Warning: Database connection failed at startup: %v. Will rely on connection retries or env config.", err)
+	} else {
+		seedAdmin()
 	}
 
 	go ws.GlobalHub.Run()
