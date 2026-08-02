@@ -286,7 +286,7 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		http.Error(w, "Failed to update task", http.StatusInternalServerError)
+		http.Error(w, "Failed to update task: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
