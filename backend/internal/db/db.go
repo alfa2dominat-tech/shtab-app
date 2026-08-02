@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -23,16 +24,36 @@ func InitDB() error {
 		host, port, user, password, dbname, sslmode)
 
 	var err error
-	DB, err = sql.Open("postgres", connStr)
+	for i := 0; i < 15; i++ {
+		DB, err = sql.Open("postgres", connStr)
+		if err == nil {
+			if err = DB.Ping(); err == nil {
+				log.Println("Successfully connected to PostgreSQL database")
+				break
+			}
+		}
+		log.Printf("Waiting for database connection... (attempt %d/15): %v", i+1, err)
+		time.Sleep(2 * time.Second)
+	}
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to database after retries: %v", err)
 	}
 
-	if err = DB.Ping(); err != nil {
-		return err
+	// Auto-run schema.sql to ensure tables exist
+	schemaBytes, err := os.ReadFile("schema.sql")
+	if err != nil {
+		schemaBytes, err = os.ReadFile("/app/schema.sql")
+	}
+	if err == nil && len(schemaBytes) > 0 {
+		_, err = DB.Exec(string(schemaBytes))
+		if err != nil {
+			log.Printf("Warning during schema execution: %v", err)
+		} else {
+			log.Println("Database schema verified/executed successfully")
+		}
 	}
 
-	log.Println("Successfully connected to PostgreSQL database")
 	return nil
 }
 
