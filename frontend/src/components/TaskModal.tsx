@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Task, User } from '../types';
-import { X, Calendar, User as UserIcon, Tag, Flag, CheckCircle } from 'lucide-react';
+import { translations, Lang } from '../i18n';
+import { X } from 'lucide-react';
 
 interface TaskModalProps {
   task?: Task | null;
@@ -8,6 +9,7 @@ interface TaskModalProps {
   onClose: () => void;
   onSave: (taskData: any) => void;
   onDelete?: (taskId: string) => void;
+  lang: Lang;
 }
 
 export const TaskModal: React.FC<TaskModalProps> = ({
@@ -16,6 +18,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   onClose,
   onSave,
   onDelete,
+  lang,
 }) => {
   const [title, setTitle] = useState(task?.title || '');
   const [description, setDescription] = useState(task?.description || '');
@@ -25,6 +28,8 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   const [status, setStatus] = useState<'new' | 'in_progress' | 'review' | 'done'>(task?.status || 'new');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>(task?.priority || 'medium');
   const [assigneeId, setAssigneeId] = useState(task?.assignee_id || '');
+
+  const t = translations[lang];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +49,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 border-b border-shtab-border flex items-center justify-between bg-slate-50">
           <h3 className="font-bold text-base text-slate-800">
-            {task ? 'Edit Task' : 'Create New Task'}
+            {task ? t.editTask : t.createTask}
           </h3>
           <button
             onClick={onClose}
@@ -58,27 +63,27 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1">
           <div>
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
-              Task Title
+              {t.taskTitle}
             </label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Redesign landing page header"
+              placeholder={t.taskTitlePlaceholder}
               className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-shtab-accent"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
-              Description
+              {t.description}
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Detailed explanation of the task..."
+              placeholder={t.descPlaceholder}
               className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-shtab-accent resize-none"
             />
           </div>
@@ -86,23 +91,23 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                Status
+                {t.status}
               </label>
               <select
                 value={status}
                 onChange={(e: any) => setStatus(e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-shtab-accent"
               >
-                <option value="new">New</option>
-                <option value="in_progress">In Progress</option>
-                <option value="review">Review</option>
-                <option value="done">Done</option>
+                <option value="new">{t.colNew}</option>
+                <option value="in_progress">{t.colInProgress}</option>
+                <option value="review">{t.colReview}</option>
+                <option value="done">{t.colDone}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                Priority
+                {t.priority}
               </label>
               <select
                 value={priority}
@@ -120,7 +125,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                Due Date & Time
+                {t.dueDate}
               </label>
               <input
                 type="datetime-local"
@@ -132,14 +137,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                Assignee
+                {t.assignee}
               </label>
               <select
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-shtab-accent"
               >
-                <option value="">Unassigned</option>
+                <option value="">{t.unassigned}</option>
                 {projectMembers.map((member) => (
                   <option key={member.id} value={member.id}>
                     {member.name} ({member.email})
@@ -157,7 +162,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 onClick={() => onDelete(task.id)}
                 className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-xs font-medium transition"
               >
-                Delete Task
+                {t.deleteTask}
               </button>
             ) : <div />}
 
@@ -167,13 +172,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl text-xs font-medium transition"
               >
-                Cancel
+                {t.cancel}
               </button>
               <button
                 type="submit"
                 className="px-5 py-2 bg-shtab-accent hover:bg-shtab-accentHover text-white rounded-xl text-xs font-medium transition shadow-md shadow-indigo-500/20"
               >
-                {task ? 'Save Changes' : 'Create Task'}
+                {task ? t.saveChanges : t.createTask}
               </button>
             </div>
           </div>

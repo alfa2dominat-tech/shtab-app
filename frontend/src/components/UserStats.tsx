@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { UserStats as UserStatsType } from '../types';
-import { CheckCircle2, Calendar, TrendingUp, Award } from 'lucide-react';
+import { translations, Lang } from '../i18n';
+import { CheckCircle2, TrendingUp, Award } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
-export const UserStats: React.FC = () => {
+interface UserStatsProps {
+  lang: Lang;
+}
+
+export const UserStats: React.FC<UserStatsProps> = ({ lang }) => {
   const [stats, setStats] = useState<UserStatsType | null>(null);
   const [loading, setLoading] = useState(true);
+  const t = translations[lang];
 
   useEffect(() => {
     api.get<UserStatsType>('/stats')
@@ -26,8 +32,8 @@ export const UserStats: React.FC = () => {
   return (
     <div className="flex-1 p-8 overflow-y-auto bg-shtab-light space-y-8">
       <div>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Performance & Statistics</h2>
-        <p className="text-xs text-slate-500">Overview of your task completion activity and personal productivity.</p>
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">{t.statsTitle}</h2>
+        <p className="text-xs text-slate-500">{t.statsSubtitle}</p>
       </div>
 
       {/* KPI Cards */}
@@ -37,7 +43,7 @@ export const UserStats: React.FC = () => {
             <Award size={24} />
           </div>
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Closed Tasks</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">{t.totalClosed}</span>
             <span className="text-2xl font-bold text-slate-900">{stats?.total_closed || 0}</span>
           </div>
         </div>
@@ -47,7 +53,7 @@ export const UserStats: React.FC = () => {
             <CheckCircle2 size={24} />
           </div>
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">Closed This Week</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">{t.closedWeek}</span>
             <span className="text-2xl font-bold text-slate-900">{stats?.closed_week || 0}</span>
           </div>
         </div>
@@ -57,7 +63,7 @@ export const UserStats: React.FC = () => {
             <TrendingUp size={24} />
           </div>
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">Closed This Month</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">{t.closedMonth}</span>
             <span className="text-2xl font-bold text-slate-900">{stats?.closed_month || 0}</span>
           </div>
         </div>
@@ -65,7 +71,7 @@ export const UserStats: React.FC = () => {
 
       {/* Chart Section */}
       <div className="bg-white border border-shtab-border rounded-2xl p-6 shadow-sm">
-        <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-6">Task Completion Dynamics (Last 14 Days)</h3>
+        <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-6">{t.dailyDynamics}</h3>
         <div className="h-72 w-full">
           {stats?.daily_dynamics && stats.daily_dynamics.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -81,7 +87,7 @@ export const UserStats: React.FC = () => {
             </ResponsiveContainer>
           ) : (
             <div className="h-full flex items-center justify-center text-xs text-slate-400">
-              No completion data recorded in the last 14 days.
+              {t.noDynamics}
             </div>
           )}
         </div>

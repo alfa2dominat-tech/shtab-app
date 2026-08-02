@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { User } from '../types';
-import { Shield, Mail, Calendar, CheckSquare, UserCheck, UserX } from 'lucide-react';
+import { translations, Lang } from '../i18n';
 
-export const AdminPanel: React.FC = () => {
+interface AdminPanelProps {
+  lang: Lang;
+}
+
+export const AdminPanel: React.FC<AdminPanelProps> = ({ lang }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = translations[lang];
 
   const fetchUsers = () => {
     api.get<User[]>('/admin/users')
@@ -38,20 +43,20 @@ export const AdminPanel: React.FC = () => {
   return (
     <div className="flex-1 p-8 overflow-y-auto bg-shtab-light space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Admin Cabinet</h2>
-        <p className="text-xs text-slate-500">Manage registered users, inspect account metadata, and control access roles.</p>
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">{t.adminTitle}</h2>
+        <p className="text-xs text-slate-500">{t.adminSubtitle}</p>
       </div>
 
       <div className="bg-white border border-shtab-border rounded-2xl shadow-sm overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-shtab-border bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-              <th className="p-4">User</th>
-              <th className="p-4">Email</th>
-              <th className="p-4">Role</th>
-              <th className="p-4">Registered</th>
-              <th className="p-4">Tasks Count</th>
-              <th className="p-4 text-right">Actions</th>
+              <th className="p-4">{t.userColumn}</th>
+              <th className="p-4">{t.emailColumn}</th>
+              <th className="p-4">{t.roleColumn}</th>
+              <th className="p-4">{t.registeredColumn}</th>
+              <th className="p-4">{t.tasksCountColumn}</th>
+              <th className="p-4 text-right">{t.actionsColumn}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
@@ -83,14 +88,14 @@ export const AdminPanel: React.FC = () => {
                       onClick={() => handleRoleChange(u.id, 'user')}
                       className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition"
                     >
-                      Demote to User
+                      {t.demoteToUser}
                     </button>
                   ) : (
                     <button
                       onClick={() => handleRoleChange(u.id, 'admin')}
                       className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-medium transition"
                     >
-                      Make Admin
+                      {t.makeAdmin}
                     </button>
                   )}
                 </td>

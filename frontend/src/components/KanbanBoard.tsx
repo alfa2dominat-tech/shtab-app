@@ -1,23 +1,27 @@
 import React from 'react';
-import { Task, User } from '../types';
-import { Calendar, User as UserIcon, AlertCircle, MoreHorizontal } from 'lucide-react';
+import { Task } from '../types';
+import { translations, Lang } from '../i18n';
+import { Calendar, User as UserIcon, AlertCircle } from 'lucide-react';
 
 interface KanbanBoardProps {
   tasks: Task[];
   onUpdateTaskStatus: (taskId: string, status: 'new' | 'in_progress' | 'review' | 'done') => void;
   onSelectTask: (task: Task) => void;
+  lang: Lang;
 }
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   tasks,
-  onUpdateTaskStatus,
   onSelectTask,
+  lang,
 }) => {
+  const t = translations[lang];
+
   const columns: { id: 'new' | 'in_progress' | 'review' | 'done'; title: string; color: string }[] = [
-    { id: 'new', title: 'New', color: 'border-blue-500 bg-blue-550/10' },
-    { id: 'in_progress', title: 'In Progress', color: 'border-amber-500 bg-amber-500/10' },
-    { id: 'review', title: 'Review', color: 'border-purple-500 bg-purple-500/10' },
-    { id: 'done', title: 'Done', color: 'border-emerald-500 bg-emerald-500/10' },
+    { id: 'new', title: t.colNew, color: 'border-blue-500 bg-blue-550/10' },
+    { id: 'in_progress', title: t.colInProgress, color: 'border-amber-500 bg-amber-500/10' },
+    { id: 'review', title: t.colReview, color: 'border-purple-500 bg-purple-500/10' },
+    { id: 'done', title: t.colDone, color: 'border-emerald-500 bg-emerald-500/10' },
   ];
 
   const isDueSoon = (dueDateStr: string | null) => {
@@ -25,7 +29,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     const due = new Date(dueDateStr).getTime();
     const now = new Date().getTime();
     const diff = due - now;
-    return diff > 0 && diff < 24 * 60 * 60 * 1000; // less than 24 hours
+    return diff > 0 && diff < 24 * 60 * 60 * 1000;
   };
 
   const priorityColors = {
@@ -72,7 +76,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       {dueSoon && (
                         <span className="flex items-center space-x-1 text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-bold animate-pulse">
                           <AlertCircle size={12} />
-                          <span>Due &lt;24h</span>
+                          <span>{t.dueSoon}</span>
                         </span>
                       )}
                     </div>
@@ -107,7 +111,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               })}
               {colTasks.length === 0 && (
                 <div className="h-24 flex items-center justify-center text-xs text-slate-400 border-2 border-dashed border-slate-100 rounded-xl">
-                  No tasks
+                  {t.noTasks}
                 </div>
               )}
             </div>

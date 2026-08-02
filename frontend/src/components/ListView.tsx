@@ -1,13 +1,17 @@
 import React from 'react';
 import { Task } from '../types';
-import { Calendar, AlertCircle, User as UserIcon } from 'lucide-react';
+import { translations, Lang } from '../i18n';
+import { Calendar, AlertCircle } from 'lucide-react';
 
 interface ListViewProps {
   tasks: Task[];
   onSelectTask: (task: Task) => void;
+  lang: Lang;
 }
 
-export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
+export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask, lang }) => {
+  const t = translations[lang];
+
   const isDueSoon = (dueDateStr: string | null) => {
     if (!dueDateStr) return false;
     const due = new Date(dueDateStr).getTime();
@@ -17,10 +21,10 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
   };
 
   const statusLabels: Record<string, { label: string; color: string }> = {
-    new: { label: 'New', color: 'bg-blue-100 text-blue-700' },
-    in_progress: { label: 'In Progress', color: 'bg-amber-100 text-amber-700' },
-    review: { label: 'Review', color: 'bg-purple-100 text-purple-700' },
-    done: { label: 'Done', color: 'bg-emerald-100 text-emerald-700' },
+    new: { label: t.colNew, color: 'bg-blue-100 text-blue-700' },
+    in_progress: { label: t.colInProgress, color: 'bg-amber-100 text-amber-700' },
+    review: { label: t.colReview, color: 'bg-purple-100 text-purple-700' },
+    done: { label: t.colDone, color: 'bg-emerald-100 text-emerald-700' },
   };
 
   const priorityColors: Record<string, string> = {
@@ -36,11 +40,11 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-shtab-border bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-              <th className="p-4">Title</th>
-              <th className="p-4">Status</th>
-              <th className="p-4">Priority</th>
-              <th className="p-4">Due Date</th>
-              <th className="p-4">Assignee</th>
+              <th className="p-4">{t.taskTitle}</th>
+              <th className="p-4">{t.status}</th>
+              <th className="p-4">{t.priority}</th>
+              <th className="p-4">{t.dueDate}</th>
+              <th className="p-4">{t.assignee}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
@@ -57,7 +61,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
                     {dueSoon && (
                       <span className="flex items-center space-x-1 text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-bold animate-pulse">
                         <AlertCircle size={11} />
-                        <span>&lt;24h</span>
+                        <span>{t.dueSoon}</span>
                       </span>
                     )}
                   </td>
@@ -76,7 +80,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
                         <span>{new Date(task.due_date).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     ) : (
-                      <span className="text-slate-400">No deadline</span>
+                      <span className="text-slate-400">{t.noDeadline}</span>
                     )}
                   </td>
                   <td className="p-4">
@@ -88,7 +92,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
                         <span>{task.assignee.name}</span>
                       </div>
                     ) : (
-                      <span className="text-slate-400">Unassigned</span>
+                      <span className="text-slate-400">{t.unassigned}</span>
                     )}
                   </td>
                 </tr>
@@ -97,7 +101,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onSelectTask }) => {
             {tasks.length === 0 && (
               <tr>
                 <td colSpan={5} className="p-8 text-center text-slate-400">
-                  No tasks found in this project.
+                  {t.noTasks}
                 </td>
               </tr>
             )}

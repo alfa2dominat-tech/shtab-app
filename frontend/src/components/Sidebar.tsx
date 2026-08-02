@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Project, User } from '../types';
-import { FolderKanban, Plus, BarChart2, Shield, LogOut, CheckCircle2, ChevronRight } from 'lucide-react';
+import { translations, Lang } from '../i18n';
+import { FolderKanban, Plus, BarChart2, Shield, LogOut, ChevronRight } from 'lucide-react';
 
 interface SidebarProps {
   user: User;
@@ -11,6 +12,7 @@ interface SidebarProps {
   activeTab: 'projects' | 'stats' | 'admin';
   onSelectTab: (tab: 'projects' | 'stats' | 'admin') => void;
   onLogout: () => void;
+  lang: Lang;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -22,7 +24,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onSelectTab,
   onLogout,
+  lang,
 }) => {
+  const t = translations[lang];
+
   return (
     <aside className="w-64 bg-shtab-dark border-r border-slate-800 flex flex-col h-screen select-none text-slate-300">
       {/* Brand / Logo */}
@@ -32,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
         <div>
           <span className="font-bold text-white tracking-tight text-lg">Shtab</span>
-          <span className="text-xs block text-slate-500 font-medium">Workspace</span>
+          <span className="text-xs block text-slate-500 font-medium">{t.workspace}</span>
         </div>
       </div>
 
@@ -47,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <FolderKanban size={18} />
-          <span>Projects</span>
+          <span>{t.projects}</span>
         </button>
 
         <button
@@ -59,7 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <BarChart2 size={18} />
-          <span>My Statistics</span>
+          <span>{t.myStats}</span>
         </button>
 
         {user.role === 'admin' && (
@@ -72,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
           >
             <Shield size={18} />
-            <span>Admin Panel</span>
+            <span>{t.adminPanel}</span>
           </button>
         )}
       </div>
@@ -81,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {activeTab === 'projects' && (
         <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider px-2">
-            <span>Projects</span>
+            <span>{t.projects}</span>
             <button
               onClick={onCreateProject}
               className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition"
@@ -111,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
             {projects.length === 0 && (
               <div className="text-xs text-slate-600 px-2 py-4 text-center">
-                No projects yet. Click + to create one.
+                {t.noProjects}
               </div>
             )}
           </div>
@@ -132,7 +137,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={onLogout}
           className="p-2 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-red-400 transition"
-          title="Sign Out"
+          title={t.signOut}
         >
           <LogOut size={18} />
         </button>

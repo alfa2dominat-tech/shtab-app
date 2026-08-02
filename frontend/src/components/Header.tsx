@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Project, Notification } from '../types';
-import { Kanban, List, Table, Bell, Plus, Check, Search, Calendar, User as UserIcon } from 'lucide-react';
+import { translations, Lang } from '../i18n';
+import { Kanban, List, Table, Bell, Plus, Search, Globe } from 'lucide-react';
 
 interface HeaderProps {
   activeProject?: Project;
@@ -11,6 +12,8 @@ interface HeaderProps {
   onMarkNotificationRead: (id: string) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  lang: Lang;
+  onToggleLang: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,10 +25,13 @@ export const Header: React.FC<HeaderProps> = ({
   onMarkNotificationRead,
   searchQuery,
   onSearchChange,
+  lang,
+  onToggleLang,
 }) => {
   const [showNotifs, setShowNotifs] = useState(false);
   const unreadCount = notifications.filter((n) => !n.read).length;
   const notifRef = useRef<HTMLDivElement>(null);
+  const t = translations[lang];
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -43,10 +49,10 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center space-x-6">
         <div>
           <h2 className="text-lg font-bold text-shtab-text tracking-tight">
-            {activeProject ? activeProject.name : 'Welcome to Shtab'}
+            {activeProject ? activeProject.name : t.welcome}
           </h2>
           <p className="text-xs text-shtab-muted">
-            {activeProject ? activeProject.description || 'Project Workspace' : 'Select a project to start managing tasks'}
+            {activeProject ? activeProject.description || 'Project Workspace' : t.selectProjectHint}
           </p>
         </div>
 
@@ -59,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search tasks..."
+              placeholder={t.searchTasks}
               className="pl-9 pr-4 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-shtab-accent w-56 text-slate-700"
             />
           </div>
@@ -78,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <Kanban size={15} />
-            <span className="hidden sm:inline">Kanban</span>
+            <span className="hidden sm:inline">{t.kanban}</span>
           </button>
           <button
             onClick={() => onViewChange('list')}
@@ -89,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <List size={15} />
-            <span className="hidden sm:inline">List</span>
+            <span className="hidden sm:inline">{t.list}</span>
           </button>
           <button
             onClick={() => onViewChange('table')}
@@ -100,12 +106,12 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <Table size={15} />
-            <span className="hidden sm:inline">Table</span>
+            <span className="hidden sm:inline">{t.table}</span>
           </button>
         </div>
       )}
 
-      {/* Right: Actions & Notifications */}
+      {/* Right: Actions, Language Switcher & Notifications */}
       <div className="flex items-center space-x-3">
         {activeProject && (
           <button
@@ -113,16 +119,26 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center space-x-1.5 px-4 py-2 bg-shtab-accent hover:bg-shtab-accentHover text-white text-xs font-medium rounded-xl transition shadow-md shadow-indigo-500/20"
           >
             <Plus size={16} />
-            <span>New Task</span>
+            <span>{t.newTask}</span>
           </button>
         )}
+
+        {/* Language Switcher Button */}
+        <button
+          onClick={onToggleLang}
+          className="flex items-center space-x-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition border border-slate-200"
+          title="Switch Language / Сменить язык"
+        >
+          <Globe size={16} className="text-shtab-accent" />
+          <span>{lang === 'ru' ? 'EN' : 'RU'}</span>
+        </button>
 
         {/* Notifications Bell */}
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setShowNotifs(!showNotifs)}
             className="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition"
-            title="Notifications"
+            title={t.notifications}
           >
             <Bell size={20} />
             {unreadCount > 0 && (
@@ -135,9 +151,9 @@ export const Header: React.FC<HeaderProps> = ({
           {showNotifs && (
             <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl py-3 z-50">
               <div className="px-4 pb-2 border-b border-slate-100 flex items-center justify-between">
-                <span className="font-bold text-xs text-slate-800 uppercase tracking-wider">Notifications</span>
+                <span className="font-bold text-xs text-slate-800 uppercase tracking-wider">{t.notifications}</span>
                 <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
-                  {unreadCount} unread
+                  {unreadCount} {t.unread}
                 </span>
               </div>
               <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
@@ -161,7 +177,7 @@ export const Header: React.FC<HeaderProps> = ({
                 ))}
                 {notifications.length === 0 && (
                   <div className="p-6 text-center text-xs text-slate-400">
-                    No notifications yet.
+                    {t.noNotifications}
                   </div>
                 )}
               </div>
