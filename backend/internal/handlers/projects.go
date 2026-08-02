@@ -122,12 +122,11 @@ func GetProjectDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch members
+	// Fetch members (all workspace users)
 	rows, err := db.DB.Query(`
-		SELECT u.id, u.email, u.name, u.role, u.created_at 
-		FROM users u
-		JOIN project_members pm ON u.id = pm.user_id
-		WHERE pm.project_id = $1`, projectID)
+		SELECT id, email, name, role, created_at 
+		FROM users
+		ORDER BY name ASC`)
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
