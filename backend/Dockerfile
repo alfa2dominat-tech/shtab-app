@@ -3,10 +3,9 @@ FROM golang:1.21-alpine AS builder
 WORKDIR /app
 
 RUN apk add --no-cache git
-COPY go.mod ./
-RUN rm -f go.sum && go mod download
 
 COPY . .
+RUN rm -f go.sum && go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -o shtab-backend main.go
 
 FROM alpine:latest
