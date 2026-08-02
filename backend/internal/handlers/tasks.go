@@ -216,16 +216,6 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var completedAtVal interface{}
-	if req.Status == "done" && oldStatus != "done" {
-		completedAtVal = time.Now()
-	} else if req.Status != "done" {
-		completedAtVal = nil
-	} else {
-		// keep existing completed_at if already done
-		completedAtVal = time.Now()
-	}
-
 	var assigneeVal interface{}
 	if req.AssigneeID != nil && *req.AssigneeID != "" {
 		assigneeVal = *req.AssigneeID

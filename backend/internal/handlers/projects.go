@@ -108,7 +108,7 @@ func CreateProjectHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetProjectDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	projectID := chi.URLParam(r, "id")
-	claims, _ := r.Context().Value(auth.UserContextKey).(*auth.Claims)
+	_, _ = r.Context().Value(auth.UserContextKey).(*auth.Claims)
 
 	var p models.Project
 	err := db.DB.QueryRow(
