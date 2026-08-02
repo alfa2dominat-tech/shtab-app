@@ -1,0 +1,14 @@
+github.com/go-chi/chi/v5 v5.0.12 h1:872a9b3E0A0c2zG4U25o0670uXvH5xL0j0A5580K120=
+github.com/go-chi/chi/v5 v5.0.12/go.mod h1:BK0Y1JzT0gM9aFjI6cW8R0B538K11gZ8t6A0dM2018g=
+github.com/go-chi/cors v1.2.1 h1:KYA2Gf4f0YjJ19uT1N+W19aH6zE220sXl3X87a5g8120=
+github.com/go-chi/cors v1.2.1/go.mod h1:B0BwOnd0S0Ue6f5VwF6V40B64k3O118t0Jv1zZ10g=
+github.com/golang-jwt/jwt/v5 v5.2.1 h1:EDNnOdfY38gqNPaqj+57YAgZlOSXn5Ms/ha84EwQ8Q0=
+github.com/golang-jwt/jwt/v5 v5.2.1/go.mod h1:m21LjoU+eqJr34lmDMbreY2eSTRJ1kv77w39/MY0WB0=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzi1H5CJHUciRsJ9HaAM=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFoMo8pqsE8qDQICq8rT4beTG3PR=
+github.com/gorilla/websocket v1.5.1 h1:gm/0K8NCy2W0vS+H1A5VzN42JqS95vR4zH0l2G5K84E=
+github.com/gorilla/websocket v1.5.1/go.mod h1:xATuZdcKaVAomNBlwr/csQnoW5SKvXPT5x5q12k+4f4=
+github.com/lib/pq v1.10.9 h1:mehOATVYfiqINgIoKFLQKMJ1Jv3AzZ3+hEq90M8tFwU=
+github.com/lib/pq v1.10.9/go.mod h1:AlS6RPWsl8iukka7gzkYytnS5yZg244vN0A3VJOUpbA=
+golang.org/x/crypto v1.21.0 h1:0Mv4b3J5C1Z1LdG94b8n/70X/c/1XoK/k1zB0f8f/50=
+golang.org/x/crypto v1.21.0/go.mod h1:0Mv4b3J5C1Z1LdG94b8n/70X/c/1XoK/k1zB0f8f/50=
