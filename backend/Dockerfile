@@ -4,8 +4,7 @@ WORKDIR /app
 
 RUN apk add --no-cache git
 COPY go.mod ./
-RUN go mod tidy
-RUN go mod download
+RUN rm -f go.sum && go mod download
 
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o shtab-backend main.go
