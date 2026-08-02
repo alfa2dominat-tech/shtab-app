@@ -84,7 +84,7 @@ func AdminMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "Forbidden: admin access required", http.StatusForbidden)
 			return
 		}
-		next.ServeHTTP(w, r.Context())
+		next.ServeHTTP(w, r)
 	})
 }
 
